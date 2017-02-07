@@ -1,7 +1,7 @@
 /**************************************************************************
 # 	NAME: anyboard.js
 # 	AUTHOR: Tomas Fagerbekk
-#	CONTRIBUTOR: Matthias Monnier
+#	CONTRIBUTOR: Matthias Monnier, Hans Magnus Hallaråker
 #
 **************************************************************************/
 
