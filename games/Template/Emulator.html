@@ -1,0 +1,85 @@
+<!-- Author: Hans Magnus Hallaråker -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=no
+			initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+		<title>Emulator</title>	
+	    <!-- cordova.js based -->
+	<script src="cordova.js"></script>	
+    <script src="libs/jquery-1.11.3.min.js"></script>
+   		<!--Bootstrap library-->
+	<script src="bootstrap/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+    	<!-- Bluetooth driver and dependencies-->
+    <script src="libs/evothings/evothings.js"></script>
+    <script src="libs/evothings/easyble/easyble.js"></script>
+
+<style type="text/css">
+		[class*="mrow-"]::after {
+   		 	content: "";
+	     	clear: both;
+   		 	display: block;
+		}
+		[class*="mcol-"] {
+			float: left;
+			padding:1em;
+			width: 1em;
+			height: 1em;
+			border: 1px solid;
+			-webkit-border-radius: 1em;
+     		z-indexmoz-border-radius: 1em;
+     		border-radius: 1em;
+     		background: red;
+		}
+</style>
+<script type="text/javascript">
+	$(document).ready(function(){
+				createLayout();
+			});	
+	function createLayout() {
+		var $dots = $( "<div class=''></div>" );
+		var size = 8;
+		var number = 0;
+		var nextrow = true;
+
+		for(var i = 0; i<size; i++) {
+			var $line = $("<div class='mrow-'></div>");
+			for(var j = 0; j<size; j++) {
+				$line.append($("<div class='mcol-"+ (number++)+ "'></div>"));
+				$dots.append($line);
+			}
+		}
+		$("#matrix").html($dots);
+	}
+	function sendTapCmd() {
+
+	}
+	function sendShakeCmd() {
+
+	}
+	function sendTiltCmd() {
+
+	}
+	function sendDoubleTapCmd() {
+
+	}
+</script>
+
+	</head>	
+	<body>
+	<div class="container">
+	<h1>AnyPawn Emulator</h1>
+
+		<div id="matrix" class=""></div>
+		<br>
+		<div id="functions" class="">
+			<button type="submit" class="btn btn-success" onsubmit="sendTapCmd()">Tap</button>
+			<button type="submit" class="btn btn-success" onsubmit="sendDoubleTapCmd()">Double Tap</button>
+			<button type="submit" class="btn btn-success" onsubmit="sendShakeCmd()">Shake</button>
+			<button type="submit" class="btn btn-success" onsubmit="sendTiltCmd()">Tilt</button>
+		</div>
+	</div>
+	</body>
+</html>

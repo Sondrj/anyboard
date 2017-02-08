@@ -1,6 +1,7 @@
 <!-- Author: Hans Magnus Hallaråker -->
 <!DOCTYPE html>
 <html>
+	<head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, user-scalable=no
 		initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
@@ -18,7 +19,8 @@
     <script src="drivers/discovery.evothings.bluetooth.js"></script>
 	<script src="drivers/bean.evothings.bluetooth.js"></script>
     <script src="drivers/rfduino.evothings.bluetooth.js"></script>
-	<!-- We've used jquery for quick development -->
+    <script src="drivers/emulator.evothings.bluetooth.js"></script>
+	<!-- We've used jquery for qRuick development -->
     <script src="libs/jquery-1.11.3.min.js"></script>
     <!--Bootstrap library-->
 	<script src="bootstrap/js/bootstrap.min.js"></script>
@@ -41,8 +43,10 @@ var app = {
 
 function discoverTokens() {
     var self = this;
+    
     AnyBoard.TokenManager.scan(
         function(token) {
+        	AnyBoard.Logger(token);
             self.addToken(token);
         },
         function(errorCode) {
@@ -76,18 +80,19 @@ function addToken(token) {
 function emulator() {
 //Choose emulator device
 	var self = this;
-	AnyBoard.TokenManager.scan({
-		function(token) {
-           if(!app.device[token.address]) {
-				app.devices[token.address] = token;
-				$("#availableTokens").append('<br> <button type="button" class="btn btn-success" id="' + token.address + '" onclick="connect(' + "'" + token.address + "'" + ')" class="grey">' + token.name + ' </button><br />');
-			} 
-        },
-        function(errorCode) {
-            console.log(errorCode)
-        }
-	});
 	
+
+evothings.easyble.startScan(onDeviceFound,onScanError);
+
+		function onDeviceFound(device){
+			
+			AnyBoard.Logger('Found device:' + JSON.stringify(device.advertisementData));
+		}
+		function onScanError(error) {
+			
+			AnyBoard.Logger("Scan error: " + error);
+			
+		}
 }
 
 
@@ -358,21 +363,28 @@ function singleTokenMove(token,constraint,options) {
 		<h1>AnyBoard Template</h1>
 		<br>
 		
-		<div id="summary">
-		<p>Hello! Discover tokens by pressing the "Discover Tokens" button! This will trigger the <b>AnyBoard.TokenManager.Scan</b> function which locate nearby bluetooth signals. The devices found is then listed by the <b>addToken</b> function in the <b>anyBoardHandler.js</b> file. TO connect to your device, simply press the button which displays the name of your device. 
+		<div id="summary" class="col-sm-6 col-xs-12 col-md-8">
+		<p>Hello! Discover tokens by pressing the "Discover Tokens" button! 
 		</p>
+		
+
 		<div id="options" class="">
 		<button class="btn btn-primary" type="submit" onclick="discoverTokens()">Discover Tokens</button>
-		<button class="btn btn-success" onclick="emulator()" type="submit">Emulator</button></div>
+		<a class="btn btn-success"  href="Emulator.html" type="submit">Emulator</a></div>
 	    
 	    <div id="availableTokens"></div>
 	    </div>
+	    <div id="menu" class="col-xs-6 col-md-4">
+	    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal">More information</button>
+		</div>
+	    
 	    <div id="weHaveConnectedToPawn">You have connected to Anypawn!
 		</br>
 		<b>Previously action Detect:</b> 
 		</br>
 	    <div id="msg">Nothing</div>
 	    </div>
+
 	    <div id="functions">
 	    	<h2>Functions on the Anypawn</h2> 
 
@@ -381,5 +393,28 @@ function singleTokenMove(token,constraint,options) {
 
 	    </br>
     </div>
+    <!-- Trigger the modal with a button -->
+
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Information</h4>
+      </div>
+      <div class="modal-body">
+        <p>Discover Tokens will trigger the <b>AnyBoard.TokenManager.Scan</b> function which locate nearby bluetooth signals. The devices found is then listed by the <b>addToken</b> function. TO connect to your device, simply press the button which displays the name of your device. </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
 	</body>	
 </html>
