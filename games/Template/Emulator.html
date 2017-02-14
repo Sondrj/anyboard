@@ -33,11 +33,31 @@
      		border-radius: 1em;
      		background: red;
 		}
+		[class*="square"] {
+		    float: left;
+    		width: 3em;
+    		height: 3em;
+   	 		padding: 0em;
+    		border: 1px solid black;
+
+		}
 </style>
 <script type="text/javascript">
 	$(document).ready(function(){
 				createLayout();
+				createMovementLayout();
 			});	
+	var app = {
+		colors: {
+				1:"red",
+				2:"blue",
+				3:"lightblue",
+				4:"yellow",
+				5:"white",
+				6:"orange"
+			}
+	}
+	
 	function createLayout() {
 		var $dots = $( "<div class=''></div>" );
 		var size = 8;
@@ -53,33 +73,79 @@
 		}
 		$("#matrix").html($dots);
 	}
-	function sendTapCmd() {
+	function createMovementLayout() {
+		var size = 6;
+		var $layout = $( "<div class=''></div>" );
+		var boxnumber = 0;
 
+		for(var i = 0; i<size; i++) {
+
+			var $line = $("<div class='mrow-'></div>");
+
+			for(var j = 0; j<size; j++) {
+					$line.append($("<div id='box-"+(boxnumber++)+"' class='square' ondrop='drop(event)' ondragover='allowDrop(event)' style='background-color:"+app.colors[randomNumber()]+";'></div>"));
+				$layout.append($line);
+			}
+		}
+
+		$("#movement").html($layout);
 	}
-	function sendShakeCmd() {
+	function randomNumber() {
+    var x = Math.floor((Math.random() * 6) + 1);
+    return x;
+}
+	function sendTapCmd() {
+		var div = document.getElementById('box-1');
 
+        div.innerHTML = div.innerHTML + "<img src='8x8led.png' draggable='true' ondragstart='drag(event)' id='drag1' class='img-responsive' style='margin:auto;padding: 10px;'>";
+	}
+
+	function sendShakeCmd() {
+alert("hallo");
 	}
 	function sendTiltCmd() {
-
+alert("hallo");
 	}
 	function sendDoubleTapCmd() {
+alert("hallo");
+	}
+	function allowDrop(ev) {
+   	 ev.preventDefault();
+	}
 
+	function drag(ev) {
+    	ev.dataTransfer.setData("img", ev.target.id);
+	}
+
+	function drop(ev) {
+    	ev.preventDefault();
+    	var data = ev.dataTransfer.getData("img");
+    	ev.target.appendChild(document.getElementById(data));
+    	$("#msg").html((document.getElementById(data).parentNode.style.backgroundColor));
 	}
 </script>
 
 	</head>	
 	<body>
-	<div class="container">
+	<div class="container ">
 	<h1>AnyPawn Emulator</h1>
 
-		<div id="matrix" class=""></div>
+		<div id="matrix" class="col-xs-12 col-sm-6 col-md-7" ></div>
 		<br>
-		<div id="functions" class="">
-			<button type="submit" class="btn btn-success" onsubmit="sendTapCmd()">Tap</button>
-			<button type="submit" class="btn btn-success" onsubmit="sendDoubleTapCmd()">Double Tap</button>
-			<button type="submit" class="btn btn-success" onsubmit="sendShakeCmd()">Shake</button>
-			<button type="submit" class="btn btn-success" onsubmit="sendTiltCmd()">Tilt</button>
+		
+		
+		<div class="col-xs-7 col-md-5">
+			<div id="movement"></div>
 		</div>
+		
+		<div id="functions" class="col-xs-7 col-sm-4 col-md-8">
+			<button type="submit" class="btn btn-success" onclick="sendTapCmd()">Tap</button>
+			<button type="submit" class="btn btn-success" onclick="sendDoubleTapCmd()">Double Tap</button>
+			<button type="submit" class="btn btn-success" onclick="sendShakeCmd()">Shake</button>
+			<button type="submit" class="btn btn-success" onclick="sendTiltCmd()">Tilt</button>
+			<div id="msg"></div>
+		</div>
+
 	</div>
 	</body>
 </html>
