@@ -15,8 +15,9 @@
     	<!-- Bluetooth driver and dependencies-->
     <script src="libs/evothings/evothings.js"></script>
     <script src="libs/evothings/easyble/easyble.js"></script>
-
+    <script src="D3/d3.js"></script>
 <style type="text/css">
+
 		[class*="mrow-"]::after {
    		 	content: "";
 	     	clear: both;
@@ -31,12 +32,12 @@
 			-webkit-border-radius: 1em;
      		z-indexmoz-border-radius: 1em;
      		border-radius: 1em;
-     		background: red;
+     		background: orange;
 		}
 		[class*="square"] {
 		    float: left;
-    		width: 3em;
-    		height: 3em;
+    		width: 4em;
+    		height: 4em;
    	 		padding: 0em;
     		border: 1px solid black;
 
@@ -44,6 +45,7 @@
 </style>
 <script type="text/javascript">
 	$(document).ready(function(){
+				d3.select("body").style("background-color","black");
 				createLayout();
 				createMovementLayout();
 			});	
@@ -55,7 +57,9 @@
 				4:"yellow",
 				5:"white",
 				6:"orange"
-			}
+			},
+
+		enabled: true,
 	}
 	
 	function createLayout() {
@@ -67,7 +71,7 @@
 		for(var i = 0; i<size; i++) {
 			var $line = $("<div class='mrow-'></div>");
 			for(var j = 0; j<size; j++) {
-				$line.append($("<div class='mcol-"+ (number++)+ "'></div>"));
+				$line.append($("<div class='mcol-"+ (number)+ "' id='"+(number++)+"'  data-enable='0' onclick='switchValue(this)' ></div>"));
 				$dots.append($line);
 			}
 		}
@@ -77,13 +81,13 @@
 		var size = 6;
 		var $layout = $( "<div class=''></div>" );
 		var boxnumber = 0;
-
-		for(var i = 0; i<size; i++) {
+		var colornumber =0;
+		for(var i = 0; i<1; i++) {
 
 			var $line = $("<div class='mrow-'></div>");
 
 			for(var j = 0; j<size; j++) {
-					$line.append($("<div id='box-"+(boxnumber++)+"' class='square' ondrop='drop(event)' ondragover='allowDrop(event)' style='background-color:"+app.colors[randomNumber()]+";'></div>"));
+					$line.append($("<div id='box-"+(boxnumber++)+"' class='square' ondrop='drop(event)' onclick='placeimg(event)' ondragover='allowDrop(event)' style='background-color:"+app.colors[(colornumber++)]+";'></div>"));
 				$layout.append($line);
 			}
 		}
@@ -91,30 +95,36 @@
 		$("#movement").html($layout);
 	}
 	function randomNumber() {
-    var x = Math.floor((Math.random() * 6) + 1);
-    return x;
-}
+	    var x = Math.floor((Math.random() * 6) + 1);
+	    return x;
+	}
 	function sendTapCmd() {
 		var div = document.getElementById('box-1');
-
-        div.innerHTML = div.innerHTML + "<img src='8x8led.png' draggable='true' ondragstart='drag(event)' id='drag1' class='img-responsive' style='margin:auto;padding: 10px;'>";
+		if(div.innerHTML == "") {
+			div.innerHTML = div.innerHTML + "<img src='8x8led.png' draggable='true' ondragstart='drag(event)' id='drag1' class='img-responsive' style='margin:auto;padding: 10px;'>";
+		}
+        
 	}
 
 	function sendShakeCmd() {
-alert("hallo");
+		alert("hallo");
 	}
 	function sendTiltCmd() {
-alert("hallo");
+		alert("hallo");
 	}
 	function sendDoubleTapCmd() {
-alert("hallo");
+		alert("hallo");
 	}
 	function allowDrop(ev) {
-   	 ev.preventDefault();
+		ev.preventDefault();
 	}
 
 	function drag(ev) {
     	ev.dataTransfer.setData("img", ev.target.id);
+	}
+	function placeimg(ev) {
+		ev.target.appendChild(document.getElementById("drag1"))
+		$("#msg").html((document.getElementById("drag1").parentNode.style.backgroundColor));
 	}
 
 	function drop(ev) {
@@ -123,28 +133,43 @@ alert("hallo");
     	ev.target.appendChild(document.getElementById(data));
     	$("#msg").html((document.getElementById(data).parentNode.style.backgroundColor));
 	}
+
+
+
+	function switchValue(obj)
+	{	
+		if(obj.style.backgroundColor == "lightblue" )
+		{
+			d3.select(obj).style("background-color","orange")
+			obj.innerHTML = "&nbsp;";
+		} else {
+			d3.select(obj).style("background-color","lightblue");
+			obj.innerHTML = "&nbsp;";	
+		}
+	}
+
 </script>
 
 	</head>	
 	<body>
-	<div class="container ">
-	<h1>AnyPawn Emulator</h1>
+	<div class="container col-xs-12 col-md-12 col-md-offset-4" >
+	<h1 style="color:white">AnyPawn Emulator</h1>
 
-		<div id="matrix" class="col-xs-12 col-sm-6 col-md-7" ></div>
-		<br>
-		
-		
-		<div class="col-xs-7 col-md-5">
-			<div id="movement"></div>
-		</div>
-		
-		<div id="functions" class="col-xs-7 col-sm-4 col-md-8">
+		<div id="matrix" class="col-xs-12 col-md-12 col-sm-12" ></div>
+	
+		<div id="functions" class="col-xs-12 col-md-12">
 			<button type="submit" class="btn btn-success" onclick="sendTapCmd()">Tap</button>
 			<button type="submit" class="btn btn-success" onclick="sendDoubleTapCmd()">Double Tap</button>
 			<button type="submit" class="btn btn-success" onclick="sendShakeCmd()">Shake</button>
 			<button type="submit" class="btn btn-success" onclick="sendTiltCmd()">Tilt</button>
-			<div id="msg"></div>
+			<div style="color:white">Color choosen is:<div id="msg" style="color:white">Color </div></div>
+			
 		</div>
+
+		<div class="">
+			<div id="movement"></div>
+		</div>
+		
 
 	</div>
 	</body>

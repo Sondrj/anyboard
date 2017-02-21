@@ -25,10 +25,12 @@
 	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">	
 	<script>
 		 $(document).ready(function(){
+
 			//Will tell Anyboard to log everything
 			AnyBoard.Logger.threshold = 0;
 			$("#weHaveConnectedToPawn").hide();
 			$("#functions").hide();
+			$("#token_solo").hide();
 		});			
 	</script>
 
@@ -41,10 +43,11 @@
 
 		function discoverTokens() {
 		    var self = this;
+		    $("#availableTokens").toggle();
 		    
 		    AnyBoard.TokenManager.scan(
 		        function(token) {
-		        	AnyBoard.Logger(token);
+		        	
 		            self.addToken(token);
 		        },
 		        function(errorCode) {
@@ -58,42 +61,68 @@
 		*/
 		function addToken(token) {
 		    if(!app.devices[token.address]){
-		    	alert("hei");
+		    	
 		        app.devices[token.address] = token;
-				$("#availableTokens").append('<br> <button type="button" class="btn btn-success" id="' + token.address + '" onclick="connect(' + "'" + token.address + "'" + ')" class="grey">' + token.name + ' </button><br />');
+				$("#availableTokens").append('<br> <button type="button" class="btn btn-success" id="' + token.address + '" onclick="connect(' + "'" + token.address + "'" + ')">' + token.name + ' </button><br />');
 				
 				token.on('connect',function(){
 				    document.getElementById(token.address).className = 'green';
-		            $("#functions").append('<button type="button" onclick="sendVibrationCmd('+ "'" + token.address + "'" +')" class="indicator3"> Vibrate </button><br />');
-		            $("#functions").append('<button type="button" onclick="sendCountCmd('+ "'" + token.address + "'" +')" class="indicator3"> Count </button><br />');
-		            $("#functions").append('<button type="button" onclick="sendDisplayXCmd('+ "'" + token.address + "'" +')"class="indicator3"> Display a cross </button><br />');
-		            $("#functions").append('<button type="button" onclick="sendDisplayDigitCmd('+ "'" + token.address + "'" +')"class="indicator3"> Display digit 6 </button><br />');
-		            $("#functions").append('<button type="button" onclick="sendDisplayW('+ "'" + token.address + "'" +')"class="indicator3"> Display a W </button><br />');
-		            $("#functions").append('<button type="button" onclick="sendDisplayUp('+ "'" + token.address + "'" +')"class="indicator3"> Display an arrow up </button><br />');
-		            $("#functions").append('<button type="button" onclick="sendDisplayDown('+ "'" + token.address + "'" +')"class="indicator3"> Display an arrow down </button><br />');
-		            $("#discconect").append('<button type="button" onclick="disconnect('+ "'" + token.address + "'" +')"class="indicator3"> Discconect token </button><br />')
+			
+				    $("#functions").append('<br><div id="test" ><b>'+token + '</b><br>');
+
+		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendVibrationCmd('+ "'" + token.address + "'" +')" > Vibrate </button><br />');
+
+		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendCountCmd('+ "'" + token.address + "'" +')" > Count </button><br />');
+
+		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendDisplayXCmd('+ "'" + token.address + "'" +')"> Display a cross </button><br />');
+
+		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendDisplayDigitCmd('+ "'" + token.address + "'" +')"> Display random digit 0-9 </button><br />');
+
+		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendDisplayW('+ "'" + token.address + "'" +')"> Display a W </button><br />');
+
+		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendDisplayUp('+ "'" + token.address + "'" +')"> Display an arrow up </button><br />');
+
+		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendDisplayDown('+ "'" + token.address + "'" +')"> Display an arrow down </button><br />');
+
+		            $("#functions").append('<button type="button" class ="btn btn-danger btn-block disc" onclick="disconnect('+ "'" + token.address + "'" +')"> Disconnect token </button><br />');
+		           	
+		           	$("#functions").append('</div>');
+		          	bindFunc(token.address);
+		            
 				});
 		    }
 		}
+		function bindFunc(tokenAddress) {
+			$('.disc').click(function(){
+				//$('#'+tokenAddress).remove();
+				app.devices[tokenAddress].length = 0;
+				
+				$(this).parent().empty();
+			});
+		}
+
 		/*Will connect to a device and run an emulator*/
 		function emulator() {
-		//Choose emulator device
 			var self = this;
-			
 
-		evothings.easyble.startScan(onDeviceFound,onScanError);
+			evothings.ble.startScan(onDeviceFound,onScanError);
 
 				function onDeviceFound(device){
 					
-					AnyBoard.Logger('Found device:' + JSON.stringify(device.advertisementData));
+					$("#availableTokens").append("<br> Scan: " +JSON.stringify(device.name) + "<button onclick='con("+device+")'>Device</button>");
+					//AnyBoard.Logger('Found device:' + JSON.stringify(device.advertisementData));
 				}
 				function onScanError(error) {
-					
-					AnyBoard.Logger("Scan error: " + error);
-					
+					alert(error);
+					//AnyBoard.Logger("Scan error: " + error);
 				}
+			setTimeout(function(){evothings.ble.stopScan()},5000);
 		}
 
+		function con(device) {
+	
+
+		}
 
 		/* The connect function is called when the "Connect to device" button is pressed. 
 		    This will trigger the driver.connect (token.connect) found in the "discovery.evothings.bluethooth.js" file.
@@ -112,25 +141,29 @@
 		        this.weHaveConnectedToPawn();
 		        return;
 		    }
-
 		    // Signal that we're attempting to connect
 		    document.getElementById(tokenName).className = 'blue';
-
 		    app.token = token;
 		    // Send connect command.
-		    token.connect(weHaveConnectedToPawn());
-
+		    token.connect(weHaveConnectedToPawn(tokenName));
+		   
 		}
+		//function which disconnects token 
 		function disconnect(token) {
+		
 		    var token = app.devices[token];
-
+		    document.getElementById(token.address).className = 'red';
 		    token.disconnect();
+
 		}
-		function weHaveConnectedToPawn() {
+		function weHaveConnectedToPawn(tokenName) {
+			
+			
 			$("#weHaveConnectedToPawn").show();
-		    $("#availableTokens").hide(); // hide the available tokens after connecting to one. If multiple tokens are needed: remove this line. 
-			//$("#summary").hide();
+		    $("#availableTokens").hide(); 
+			
 		    $("#functions").show();
+		    $("#token_solo").show();
 		}
 
 		/* The sendDisplayDigitCmd function will trigger the token.displayDigit found in the driver rfduino.evothings.bluethooth.js
@@ -139,7 +172,7 @@
 
 		function sendDisplayDigitCmd(tokenName,digit) {
 		    var token = app.devices[tokenName];
-		    digit = 6; //template purpose only
+		    digit = randomNumber(); //template purpose only
 		   
 		    var completedFunction = function(data){
 		            //logging
@@ -156,6 +189,11 @@
 		            errorCallback  // function to be executed in case of failure to send command to token
 		        );
 		}
+		//Return random number between 0-9
+		function randomNumber() {
+	    var x = Math.floor((Math.random() * 9) );
+	    return x;
+	}
 
 		/* The sendDisplayXCmd function will trigger the token.displayX found in the driver rfduino.evothings.bluethooth.js
 		   file. This will display an X on the pawn LED screen.
@@ -163,13 +201,13 @@
 		function sendDisplayXCmd(tokenName) {
 		var token = app.devices[tokenName];
 
-		        // Function to be executed when LED is successfully turned on
+		         // Function to be executed when success
 		        var completedFunction = function(data){
 		            hyper.log("We happily send the DISPLAY_X command");
 		           
 		        };
 
-		        // Function to be executed upon failure of LED
+		        // Function to be executed upon failure
 		        var errorCallback = function(errorMsg) {
 		            hyper.log("Failed to send the DISPLAY_X command");
 		            hyper.log(errorMsg);
@@ -188,6 +226,7 @@
 
 		function sendVibrationCmd(tokenName) {
 		    var token = app.devices[tokenName];
+		     // Function to be executed when success
 		     var completedFunction = function(data){
 		            hyper.log("We happily send the DISPLAY_X command");
 		            
@@ -210,6 +249,7 @@
 		*/
 		function sendDisplayW(tokenName) {
 		    var token = app.devices[tokenName];
+		     // Function to be executed when success
 		     var completedFunction = function(data){
 		            hyper.log("We happily send the DISPLAY_W command");
 		            hyper.log(data)
@@ -232,6 +272,7 @@
 		*/
 		function sendDisplayUp(tokenName) {
 		    var token = app.devices[tokenName];
+		     // Function to be executed when success
 		     var completedFunction = function(data){
 		            hyper.log("We happily send the DISPLAY_UP command");
 		            
@@ -254,17 +295,18 @@
 		*/
 		function sendDisplayDown(tokenName) {
 		    var token = app.devices[tokenName];
+
+		     // Function to be executed when success
 		     var completedFunction = function(data){
 		            hyper.log("We happily send the DISPLAY_DOWN command");
-		           
 		        };
 
-		        // Function to be executed upon failure of LED
+		        // Function to be executed upon failure 
 		        var errorCallback = function(errorMsg) {
 		            hyper.log("Failed to send the DISPLAY_DOWN command");
 		            hyper.log(errorMsg);
 		        };
-		                // Turns on token led.
+		                
 		        token.displayDown([1], //
 		            completedFunction,  // function to be executed when token signals
 		            errorCallback  // function to be executed in case of failure to send command to token
@@ -273,40 +315,58 @@
 
 		function sendCountCmd(tokenName) {
 		    var token = app.devices[tokenName];
-		    // Function to be executed when LED is successfully turned on
+		    // Function to be executed when success
 		    var completedFunction = function(data){
 		        hyper.log("We happily send the COUNT command");
 		        hyper.log(data)
 		    };
 
-		    // Function to be executed upon failure of LED
+		    // Function to be executed upon failure
 		    var errorCallback = function(errorMsg) {
 		        hyper.log("Failed to send the COUNT command");
 		        hyper.log(errorMsg);
 		    };
 
 		    // Turns on token led.
-		    token.count([1], // Instead of "green" color, on could also use array, e.g. [0, 255, 0]
+		    token.count([1], 
 		        completedFunction,  // function to be executed when token signals
 		        errorCallback  // function to be executed in case of failure to send command to token
 		    );
 		}
-		/*THe following functions are mapped to AnyBoard.TokenManager-tokenlistener ...*/
+		/*THe following functions are mapped to AnyBoard.TokenManager-tokenlistener ...
+		* The functions will be handled continously as actions are detected!
+		*/
 		function handleTokenTap(token) {
-		   // alert("This is a single tap");
+		   // This is a single tap
 		   document.getElementById("msg").innerHTML = "This is a tap";
+		   $("#tap").css("background-color","red");
+				setTimeout(function () {
+					$("#tap").css("background-color", "#99C2FF");
+				}, 500);
 		}
 		function handleTokenDoubleTap(token) {
-		   // alert("This is a double tap");
+		   // This is a double tap
 		   document.getElementById("msg").innerHTML = "This is a Double_tap";
-		}
+			$("#double_tap").css("background-color","red");
+				setTimeout(function () {
+					$("#double_tap").css("background-color", "#99C2FF");
+				}, 500);
+	}
 		function handleTokenShake(token) {
-		  //  alert("This is a shake");
+		  //  This is a shake
 		  document.getElementById("msg").innerHTML = "This is a SHAKE";
+		  	$("#shake").css("background-color","red");
+					setTimeout(function () {
+						$("#shake").css("background-color", "#99C2FF");
+					}, 500);
 		}
 		function handleTokenTilt(token) {
-		  //  alert("This is a tilt");
+		  //  This is a tilt
 		  document.getElementById("msg").innerHTML = "This is a TILT";
+		  $("#tilt").css("background-color","red");
+					setTimeout(function () {
+						$("#tilt").css("background-color", "#99C2FF");
+					}, 550);
 		}
 
 		/* AnyBoard.TokenManager.onTokenMove only detects if there have been an change from one color to another.
@@ -317,7 +377,7 @@
 		  //  alert("This is a move");
 		  document.getElementById("msg").innerHTML = "This is a MOVE";
 		}
-
+		/*The following single-functions will only trigger ONCE*/
 		function singleTokenTap(token) {
 		     alert("Will only trigger once. TAP");
 		}
@@ -345,7 +405,7 @@
 			AnyBoard.TokenManager.onTokenEvent("TILT", handleTokenTilt);
 			AnyBoard.TokenManager.onTokenConstraintEvent("MOVE_TO",handleTokenMove);
 		
-	    //tokenlistener for detecting a single TAP,DOUBLE_TAP,SHAKE,TILT and MOVE_TO(movement). Only detected/executed once.
+	    //tokenlistener used to detect TAP,DOUBLE_TAP,SHAKE,TILT and MOVE_TO(movement) ONCE. Only detected/executed once!!!
 	    	AnyBoard.TokenManager.onceTokenEvent("TAP", singleTokenTap);
 	    	AnyBoard.TokenManager.onceTokenEvent("DOUBLE_TAP", singleTokenDoubleTap);
 	    	AnyBoard.TokenManager.onceTokenEvent("SHAKE", singleTokenShake);
@@ -361,36 +421,53 @@
 		<br>
 		
 		<div id="summary" class="col-sm-6 col-xs-12 col-md-8">
-		<p>Hello! Discover tokens by pressing the "Discover Tokens" button! 
-		</p>
-		
 
-		<div id="options" class="col-sm-6 col-xs-12 col-md-8">
-		<button class="btn btn-primary" type="submit" onclick="discoverTokens()">Discover Tokens</button>
-		</div>
-	    
-	    <div id="availableTokens"></div>
+			<p>Hello! Discover tokens by pressing the "Discover Tokens" button! 
+			</p>
+			<div id="options" class="col-sm-6 col-xs-12 col-md-8">
+				<button class="btn btn-primary" type="submit" onclick="discoverTokens()">Discover Tokens</button>
+			</div>
+		    <br>
+		    <hr>
+		    Available tokens:
+		    <div id="availableTokens"></div>
+		    <br>
+		    <hr>
+    	    <div id="weHaveConnectedToPawn">
+			    You have connected to a device!
+				</br>
+				<b>Previously action Detect:</b> 
+				</br>
+		    	<div id="msg">Nothing</div>
+	    	</div>	
+	    	<div id="functions">
+	    		<h2>Functions on the Anypawn</h2> 
+    		</div>
+			
 	    </div>
 
 
-	    <div id="menu" class="col-xs-6 col-md-4">
+	    <div id="menu" class="col-xs-12 col-md-4">
 	    <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#myModal">More information</button>
 	    <br>
 	    <a class="btn btn-success btn-block"  href="Emulator.html" type="submit">Emulator</a>
+	    <br>
+	    <button type="button" class="btn btn-info btn-block" onclick="emulator()">Scan</button>
+
+	   
 		</div>
 	    
-	    <div id="weHaveConnectedToPawn">You have connected to Anypawn!
-		</br>
-		<b>Previously action Detect:</b> 
-		</br>
-	    <div id="msg">Nothing</div>
-	    </div>
+		 <div id="token_solo" class="col-xs-12 col-md-4">
+				<h2> Token Solo Event </h2>
+				<div>
+					<button id="tap" class="btn btn-lg" style="background-color:#99C2FF;">Tap</button>
+					<button id="double_tap" class="btn btn-lg" style="background-color:#99C2FF;">Double T.</button>
+					<button id="shake" class="btn btn-lg" style="background-color:#99C2FF;">Shake</button>
+					<button id="tilt" class="btn btn-lg" style="background-color:#99C2FF;">Tilt</button>
+				</div>
+			</div>
 
-	    <div id="functions">
-	    	<h2>Functions on the Anypawn</h2> 
-
-	    </div>
-	    <div id="disconnect"></div>
+	    
 
 	    </br>
     </div>

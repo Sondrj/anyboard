@@ -56,7 +56,7 @@
      */
     discoveryBluetooth.disconnect = function (token) {
         AnyBoard.Logger.debug('Disconnecting from device: ' + token, this);
-        token.device && token.device.close()
+        token.device && token.device.close();
         token.device.haveServices = false;
     };
 
@@ -79,7 +79,9 @@
         var self = this;
 
         evothings.easyble.reportDeviceOnce(true);
+       
         evothings.easyble.startScan(function(device){
+
             var token = self._initializeDevice(device);  // Converts bt device to AnyBoard.BaseToken
             win && win(token);
         }, function(errorCode) {
@@ -128,6 +130,7 @@
             this._devices[device.address] = token;
             return token;
         }
+
         AnyBoard.Logger.log('Device already in _devices property', this);
         return this._devices[device.address];
     };
