@@ -30,7 +30,7 @@
 			AnyBoard.Logger.threshold = 0;
 			$("#weHaveConnectedToPawn").hide();
 			$("#functions").hide();
-			$("#token_solo").hide();
+			
 		});			
 	</script>
 
@@ -38,8 +38,11 @@
 		// variable with tokens
 		var app = {
 			devices: {},
-		    token:{}
+		    token:{},
+		    count:0
 		}
+
+		
 
 		function discoverTokens() {
 		    var self = this;
@@ -67,39 +70,55 @@
 				
 				token.on('connect',function(){
 				    document.getElementById(token.address).className = 'green';
-			
-				    $("#functions").append('<br><div id="test" ><b>'+token + '</b><br>');
-
-		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendVibrationCmd('+ "'" + token.address + "'" +')" > Vibrate </button><br />');
-
-		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendCountCmd('+ "'" + token.address + "'" +')" > Count </button><br />');
-
-		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendDisplayXCmd('+ "'" + token.address + "'" +')"> Display a cross </button><br />');
-
-		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendDisplayDigitCmd('+ "'" + token.address + "'" +')"> Display random digit 0-9 </button><br />');
-
-		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendDisplayW('+ "'" + token.address + "'" +')"> Display a W </button><br />');
-
-		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendDisplayUp('+ "'" + token.address + "'" +')"> Display an arrow up </button><br />');
-
-		            $("#functions").append('<button type="button" class ="btn btn-primary btn-block" onclick="sendDisplayDown('+ "'" + token.address + "'" +')"> Display an arrow down </button><br />');
-
-		            $("#functions").append('<button type="button" class ="btn btn-danger btn-block disc" onclick="disconnect('+ "'" + token.address + "'" +')"> Disconnect token </button><br />');
-		           	
-		           	$("#functions").append('</div>');
-		          	bindFunc(token.address);
-		            
+				   
+				    appendAccordion(token);
+				    appendButtons(token,"sendVibrationCmd","Vibrate");
+				    appendButtons(token,"sendCountCmd","Count")
+					appendButtons(token,"sendDisplayXCmd","Display a cross")
+					appendButtons(token,"sendDisplayDigitCmd","Display random digit 0-9")
+					appendButtons(token,"sendDisplayW","Display a W")
+					appendButtons(token,"sendDisplayUp"," Display an arrow up")
+					appendButtons(token,"sendDisplayDown","Display an arrow down")
+					appendButtons(token,"disconnect","Disconnect token")
+					app.count++;
+					
+		           	bindFunc(token);
 				});
 		    }
 		}
-		function bindFunc(tokenAddress) {
-			$('.disc').click(function(){
-				//$('#'+tokenAddress).remove();
-				app.devices[tokenAddress].length = 0;
-				
-				$(this).parent().empty();
-			});
+		function bindFunc(token) {
+			
+			$(".cc").on("click", function(e){
+	              var $_target =  $(e.currentTarget);
+	              var $_panelBody = $_target.parent().parent().parent().find(".panel-collapse");
+	              if($_panelBody){
+	                $_panelBody.collapse('toggle')
+	              }
+	        })
 		}
+ 		/*Append accordion with token info*/
+		function appendAccordion(token) {
+			$("#accordion").append(
+				'<div class="panel panel-default" >'+
+					'<div class="panel-heading">' +
+						'<h4 class="panel-title">' +
+							'<a id="cc" class="cc" data-toggle="collapse" data-parent="#ac" href="#'+token.address+'" data-target="#'+token.address+'" aria-expanded="false" aria-controls="'+token.address+'"><span class="glyphicon glyphicon-chevron-left"></span>'+token+' </a>' +
+						'</h4>' +
+					'</div>' +
+					'<div id="'+token.address+'" class="panel-collapse collapse in" >'+
+						'<div id="'+app.count+'" class="panel-body">'+	
+						'</div>'+
+					'</div>'+
+				'</div>'
+			);
+			
+		}
+		/*Append buttons on token-info*/
+		function appendButtons(token,func,value) {
+			$("#"+app.count).append('<button type="button" class="btn btn-primary btn-block" onclick="'+func+'('+ "'" +token.address+ "'" +')">'+value+'</button></br>');
+			
+		}
+
 
 		/*Will connect to a device and run an emulator*/
 		function emulator() {
@@ -145,7 +164,9 @@
 		    document.getElementById(tokenName).className = 'blue';
 		    app.token = token;
 		    // Send connect command.
-		    token.connect(weHaveConnectedToPawn(tokenName));
+		    token.connect(weHaveConnectedToPawn(tokenName),function(error) {
+		    	document.getElementById(tokenName).className = 'red';
+		    });
 		   
 		}
 		//function which disconnects token 
@@ -439,15 +460,18 @@
 				<b>Previously action Detect:</b> 
 				</br>
 		    	<div id="msg">Nothing</div>
-	    	</div>	
+	    	</div>
+	    	<h2>Functions on the Anypawn</h2> 	
 	    	<div id="functions">
-	    		<h2>Functions on the Anypawn</h2> 
+	    		
     		</div>
-			
+
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+			</div>
 	    </div>
 
 
-	    <div id="menu" class="col-xs-12 col-md-4">
+	    <div id="menu" class="col-sm-6 col-xs-12 col-md-4">
 	    <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#myModal">More information</button>
 	    <br>
 	    <a class="btn btn-success btn-block"  href="Emulator.html" type="submit">Emulator</a>
@@ -457,7 +481,7 @@
 	   
 		</div>
 	    
-		 <div id="token_solo" class="col-xs-12 col-md-4">
+		 <div id="token_solo" class="col-sm-6 col-xs-12 col-md-4">
 				<h2> Token Solo Event </h2>
 				<div>
 					<button id="tap" class="btn btn-lg" style="background-color:#99C2FF;">Tap</button>
