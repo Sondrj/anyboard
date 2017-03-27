@@ -17,6 +17,7 @@
     <script src="drivers/discovery.evothings.bluetooth.js"></script>
 	<script src="drivers/bean.evothings.bluetooth.js"></script>
     <script src="drivers/rfduino.evothings.bluetooth.js"></script>
+    <script src="drivers/emulator.evothings.bluetooth.js"></script>
     
 	<!-- We've used jquery for qRuick development -->
     <script src="libs/jquery-1.11.3.min.js"></script>
@@ -30,7 +31,11 @@
 			AnyBoard.Logger.threshold = 0;
 			$("#weHaveConnectedToPawn").hide();
 			$("#functions").hide();
-			
+			nfc.enabled(
+ 				 function() {alert('yes!')},
+  				// msg is one of NO_NFC (no hardware support) or NFC_DISABLED (supported but disabled)
+ 				 function(msg) {alert(msg)}
+			);
 		});			
 	</script>
 
@@ -79,7 +84,7 @@
 					appendButtons(token,"sendDisplayW","Display a W")
 					appendButtons(token,"sendDisplayUp"," Display an arrow up")
 					appendButtons(token,"sendDisplayDown","Display an arrow down")
-					appendButtons(token,"disconnect","Disconnect token")
+					appendDisconnect(token,"disconnect","Disconnect token")
 					app.count++;
 					
 		           	bindFunc(token);
@@ -94,7 +99,14 @@
 	              if($_panelBody){
 	                $_panelBody.collapse('toggle')
 	              }
-	        })
+	        });
+
+	        $(".disc").on("click", function(e){
+        		var $_target =  $(e.currentTarget);
+                var $_panel = $_target.parent().parent().parent();
+                $_panel.remove();
+	        });
+
 		}
  		/*Append accordion with token info*/
 		function appendAccordion(token) {
@@ -102,7 +114,7 @@
 				'<div class="panel panel-default" >'+
 					'<div class="panel-heading">' +
 						'<h4 class="panel-title">' +
-							'<a id="cc" class="cc" data-toggle="collapse" data-parent="#ac" href="#'+token.address+'" data-target="#'+token.address+'" aria-expanded="false" aria-controls="'+token.address+'"><span class="glyphicon glyphicon-chevron-left"></span>'+token+' </a>' +
+							'<a id="cc" class="cc" data-toggle="collapse" data-parent="#accordion" href="#'+token.address+'" data-target="#'+token.address+'" aria-expanded="false" aria-controls="'+token.address+'"><span class="glyphicon glyphicon-chevron-left"></span>'+token.name+' </a>' +
 						'</h4>' +
 					'</div>' +
 					'<div id="'+token.address+'" class="panel-collapse collapse in" >'+
@@ -116,20 +128,67 @@
 		/*Append buttons on token-info*/
 		function appendButtons(token,func,value) {
 			$("#"+app.count).append('<button type="button" class="btn btn-primary btn-block" onclick="'+func+'('+ "'" +token.address+ "'" +')">'+value+'</button></br>');
-			
+		}
+		function appendDisconnect(token,func,value) {
+			$("#"+app.count).append('<button type="button" class="btn btn-danger btn-block disc" onclick="'+func+'('+ "'" +token.address+ "'" +')">'+value+'</button></br>');
 		}
 
+		function addEmulator() {
+
+			var emulator = {
+				name: "Emulator",
+				address: "This",
+				id: 0
+			}
+
+			appendAccordion(emulator);
+			appendButtons(emulator,"emulateVibrateCmd","Vibrate");
+			appendButtons(emulator,"emulateCountCmd","Count")
+			appendButtons(emulator,"emulateDisplayXCmd","Display a cross")
+			appendButtons(emulator,"emulateDisplayDigitCmd","Display random digit 0-9")
+			appendButtons(emulator,"emulateDisplayW","Display a W")
+			appendButtons(emulator,"emulateDisplayUp"," Display an arrow up")
+			appendButtons(emulator,"emulateDisplayDown","Display an arrow down")
+			appendDisconnect(emulator,"emulateDisconnect","Disconnect token")
+			app.count++;
+			//id++;
+		}
+		function emulateVibrateCmd(emulator) {
+
+		}
+		function emulateCountCmd(emulator) {
+
+		}
+		function emulateDisplayXCmd(emulator) {
+
+		}
+		function emulateDisplayDigitCmd(emulator) {
+
+		}
+		function emulateDisplayW(emulator) {
+
+		}
+		function emulateDisplayUp(emulator) {
+
+		}
+		function emulateDisplayDown(emulator) {
+
+		} 
+		function emulateDisconnect(emulator) {
+
+		}
 
 		/*Will connect to a device and run an emulator*/
 		function emulator() {
 			var self = this;
-
+			addEmulator();
 			evothings.ble.startScan(onDeviceFound,onScanError);
 
 				function onDeviceFound(device){
 					
-					$("#availableTokens").append("<br> Scan: " +JSON.stringify(device.name) + "<button onclick='con("+device+")'>Device</button>");
+					$("#availableTokens").append("<br> Device Name: " +JSON.stringify(device.name) + ", Device UUID: " + JSON.stringify(device.advertisementData));
 					//AnyBoard.Logger('Found device:' + JSON.stringify(device.advertisementData));
+					//"<button onclick='con("+device+")'>Device</button>"
 				}
 				function onScanError(error) {
 					alert(error);
@@ -164,6 +223,7 @@
 		    document.getElementById(tokenName).className = 'blue';
 		    app.token = token;
 		    // Send connect command.
+		    $("#attempt").innerHTML= "Attempting to connect to token";
 		    token.connect(weHaveConnectedToPawn(tokenName),function(error) {
 		    	document.getElementById(tokenName).className = 'red';
 		    });
@@ -182,7 +242,7 @@
 			
 			$("#weHaveConnectedToPawn").show();
 		    $("#availableTokens").hide(); 
-			
+			$("#attempt").innerHTML= "";
 		    $("#functions").show();
 		    $("#token_solo").show();
 		}
@@ -454,6 +514,7 @@
 		    <div id="availableTokens"></div>
 		    <br>
 		    <hr>
+		    <div id="attepmt"></div>
     	    <div id="weHaveConnectedToPawn">
 			    You have connected to a device!
 				</br>
@@ -474,9 +535,9 @@
 	    <div id="menu" class="col-sm-6 col-xs-12 col-md-4">
 	    <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#myModal">More information</button>
 	    <br>
-	    <a class="btn btn-success btn-block"  href="Emulator.html" type="submit">Emulator</a>
+	    <a class="btn btn-success btn-block"  onclick="addEmulator()" type="submit">Add Emulator</a>
 	    <br>
-	    <button type="button" class="btn btn-info btn-block" onclick="emulator()">Scan</button>
+	    <button type="button" class="btn btn-info btn-block" onclick="emulator()">Scan after Emulator</button>
 
 	   
 		</div>

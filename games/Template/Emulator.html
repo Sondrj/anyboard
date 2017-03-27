@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no
 			initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
 		<title>Emulator</title>	
+
 	    <!-- cordova.js based -->
 	<script src="cordova.js"></script>	
     <script src="libs/jquery-1.11.3.min.js"></script>
@@ -16,139 +17,216 @@
     <script src="libs/evothings/evothings.js"></script>
     <script src="libs/evothings/easyble/easyble.js"></script>
     <script src="D3/d3.js"></script>
-<style type="text/css">
+  
+  
+	<style type="text/css">
 
-		[class*="mrow-"]::after {
-   		 	content: "";
-	     	clear: both;
-   		 	display: block;
-		}
-		[class*="mcol-"] {
-			float: left;
-			padding:1em;
-			width: 1em;
-			height: 1em;
-			border: 1px solid;
-			-webkit-border-radius: 1em;
-     		z-indexmoz-border-radius: 1em;
-     		border-radius: 1em;
-     		background: orange;
-		}
-		[class*="square"] {
-		    float: left;
-    		width: 4em;
-    		height: 4em;
-   	 		padding: 0em;
-    		border: 1px solid black;
+			[class*="mrow-"]::after {
+	   		 	content: "";
+		     	clear: both;
+	   		 	display: block;
+			}
+			[class*="mcol-"] {
+				float: left;
+				padding:1em;
+				width: 1em;
+				height: 1em;
+				border: 1px solid;
+				-webkit-border-radius: 1em;
+	     		z-indexmoz-border-radius: 1em;
+	     		border-radius: 1em;
+	     		background: orange;
+			}
+			[class*="square"] {
+			    float: left;
+	    		width: 4em;
+	    		height: 4em;
+	   	 		padding: 0em;
+	    		border: 1px solid black;
 
-		}
-</style>
-<script type="text/javascript">
-	$(document).ready(function(){
-				d3.select("body").style("background-color","black");
-				createLayout();
-				createMovementLayout();
-			});	
-	var app = {
-		colors: {
-				1:"red",
-				2:"blue",
-				3:"lightblue",
-				4:"yellow",
-				5:"white",
-				6:"orange"
-			},
+			}
+	</style>
+	<script type="text/javascript">
+		$(document).ready(function(){
+					d3.select("body").style("background-color","black");
+					createLayout();
+					createMovementLayout();
 
-		enabled: true,
-	}
-	
-	function createLayout() {
-		var $dots = $( "<div class=''></div>" );
-		var size = 8;
-		var number = 0;
-		var nextrow = true;
+				});
+			
+		var app = {
+			colors: {
+					1:"red",
+					2:"blue",
+					3:"lightblue",
+					4:"yellow",
+					5:"white",
+					6:"orange"
+				},
 
-		for(var i = 0; i<size; i++) {
-			var $line = $("<div class='mrow-'></div>");
-			for(var j = 0; j<size; j++) {
-				$line.append($("<div class='mcol-"+ (number)+ "' id='"+(number++)+"'  data-enable='0' onclick='switchValue(this)' ></div>"));
-				$dots.append($line);
+			enabled: true,
+
+			symbol: {
+				0: 	"0000000000011000001001000010010000100100001001000001100000000000",
+				1:  "B00000000B00001000B00011000B00101000B00001000B00001000B00111100B00000000",
+				2: 	"B00000000B00011000B00100100B00000100B00001000B00010000B00111100B00000000",
+			    3:  "B00000000B00011000B00100100B00001000B00000100B00100100B00011000B00000000",
+			    4:  "B00000000B00100000B00100000B00101000B00111100B00001000B00001000B00000000",
+			    5:  "B00000000B00111100B00100000B00111000B00000100B00100100B00011000B00000000",
+			    6:  "B00000000B00001100B00010000B00111000B00100100B00100100B00011000B00000000",
+			    7:  "B00000000B00111100B00000100B00001000B00010000B00010000B00010000B00000000",
+				8:  "B00000000B00011000B00100100B00011000B00100100B00100100B00011000B00000000",
+			    9:  "B00000000B00011000B00100100B00011100B00000100B00000100B00000100B00000000",
+			    X:  "B10000001B01000010B00100100B00011000B00011000B00100100B01000010B10000001",
+			    W:  "B10000001B10000001B10000001B10011001B01011010B01011010B01100110B01000010",
+			    UP: "B00011000B00111100B01011010B10011011B00011000B00011000B00011000B00011000",
+			   DOWN:"B00011000B00011000B00011000B00011000B10011001B01011010B00111100B00011000"
+					
 			}
 		}
-		$("#matrix").html($dots);
-	}
-	function createMovementLayout() {
-		var size = 6;
-		var $layout = $( "<div class=''></div>" );
-		var boxnumber = 0;
-		var colornumber =0;
-		for(var i = 0; i<1; i++) {
+		
+		function createLayout() {
+			var $dots = $( "<div class=''></div>" );
+			var size = 8;
+			var number = 0;
+			var nextrow = true;
 
-			var $line = $("<div class='mrow-'></div>");
+			for(var i = 0; i<size; i++) {
+				var $line = $("<div class='mrow-'></div>");
+				for(var j = 0; j<size; j++) {
+					$line.append($("<div class='mcol-"+ (number)+ "' id='"+(number++)+"'  data-enable='0' onclick='switchValue(this)' ></div>"));
+					$dots.append($line);
+				}
+			}
+			$("#matrix").html($dots);
+		}
 
-			for(var j = 0; j<size; j++) {
-					$line.append($("<div id='box-"+(boxnumber++)+"' class='square' ondrop='drop(event)' onclick='placeimg(event)' ondragover='allowDrop(event)' style='background-color:"+app.colors[(colornumber++)]+";'></div>"));
-				$layout.append($line);
+		function displaySymbol(symbol) {
+			
+			switch(symbol) {
+				case 0: display(app.symbol[0]);
+				break;
+				case 1: display(app.symbol[1]);
+				break;
+				case 2: display(app.symbol[2]);
+				break;
+				case 3: display(app.symbol[3]);
+				break;
+				case 4: display(app.symbol[4]);
+				break;
+				case 5: display(app.symbol[5]);
+				break;
+				case 6: display(app.symbol[6]);
+				break;
+				case 7: display(app.symbol[7]);
+				break;
+				case 8: display(app.symbol[8]);
+				break;
+				case 9: display(app.symbol[9]);
+				break;
+				case 'X': display(app.symbol['X']);
+				break;
+				case 'W': display(app.symbol['W']);
+				break;
+				case 'UP': display(app.symbol['UP']);
+				break;
+				case 'DOWN': display(app.symbol['DOWN']);
+				break;
+			}
+
+		}
+
+		function display(x) {
+			
+			//switchValue(document.getElementById(1));
+			var number = 0;
+			for(var i=0; i<x.length;i++) {
+				if(x[i] != 'B') {
+					number++;
+				}
+				if(x[i] == 1) {
+					switchValue(document.getElementById(number-1));
+				}
+			}
+		}
+		function resetDisplay() {
+			for(var i = 0; i<64; i++) {
+				d3.select(document.getElementById(i)).style("background-color", "orange");
 			}
 		}
 
-		$("#movement").html($layout);
-	}
-	function randomNumber() {
-	    var x = Math.floor((Math.random() * 6) + 1);
-	    return x;
-	}
-	function sendTapCmd() {
-		var div = document.getElementById('box-1');
-		if(div.innerHTML == "") {
-			div.innerHTML = div.innerHTML + "<img src='8x8led.png' draggable='true' ondragstart='drag(event)' id='drag1' class='img-responsive' style='margin:auto;padding: 10px;'>";
+		function createMovementLayout() {
+			var size = 6;
+			var $layout = $( "<div class=''></div>" );
+			var boxnumber = 0;
+			var colornumber =0;
+			for(var i = 0; i<1; i++) {
+
+				var $line = $("<div class='mrow-'></div>");
+
+				for(var j = 0; j<size; j++) {
+						$line.append($("<div id='box-"+(boxnumber++)+"' class='square' ondrop='drop(event)' onclick='placeimg(event)' ondragover='allowDrop(event)' style='background-color:"+app.colors[(colornumber++)]+";'></div>"));
+					$layout.append($line);
+				}
+			}
+
+			$("#movement").html($layout);
 		}
-        
-	}
-
-	function sendShakeCmd() {
-		alert("hallo");
-	}
-	function sendTiltCmd() {
-		alert("hallo");
-	}
-	function sendDoubleTapCmd() {
-		alert("hallo");
-	}
-	function allowDrop(ev) {
-		ev.preventDefault();
-	}
-
-	function drag(ev) {
-    	ev.dataTransfer.setData("img", ev.target.id);
-	}
-	function placeimg(ev) {
-		ev.target.appendChild(document.getElementById("drag1"))
-		$("#msg").html((document.getElementById("drag1").parentNode.style.backgroundColor));
-	}
-
-	function drop(ev) {
-    	ev.preventDefault();
-    	var data = ev.dataTransfer.getData("img");
-    	ev.target.appendChild(document.getElementById(data));
-    	$("#msg").html((document.getElementById(data).parentNode.style.backgroundColor));
-	}
-
-
-
-	function switchValue(obj)
-	{	
-		if(obj.style.backgroundColor == "lightblue" )
-		{
-			d3.select(obj).style("background-color","orange")
-			obj.innerHTML = "&nbsp;";
-		} else {
-			d3.select(obj).style("background-color","lightblue");
-			obj.innerHTML = "&nbsp;";	
+		function randomNumber() {
+		    var x = Math.floor((Math.random() * 6) + 1);
+		    return x;
 		}
-	}
+		function sendTapCmd() {
+			var div = document.getElementById('box-1');
+			if(div.innerHTML == "") {
+				div.innerHTML = div.innerHTML + "<img src='8x8led.png' draggable='true' ondragstart='drag(event)' id='drag1' class='img-responsive' style='margin:auto;padding: 10px;'>";
+			}
+	        
+		}
 
-</script>
+		function sendShakeCmd() {
+			//alert("shake");
+			displaySymbol('X');
+		}
+		function sendTiltCmd() {
+			resetDisplay();
+		}
+		function sendDoubleTapCmd() {
+			alert("hallo");
+		}
+		function allowDrop(ev) {
+			ev.preventDefault();
+		}
+
+		function drag(ev) {
+	    	ev.dataTransfer.setData("img", ev.target.id);
+		}
+		function placeimg(ev) {
+			ev.target.appendChild(document.getElementById("drag1"))
+			$("#msg").html((document.getElementById("drag1").parentNode.style.backgroundColor));
+		}
+
+		function drop(ev) {
+	    	ev.preventDefault();
+	    	var data = ev.dataTransfer.getData("img");
+	    	ev.target.appendChild(document.getElementById(data));
+	    	$("#msg").html((document.getElementById(data).parentNode.style.backgroundColor));
+		}
+
+		function switchValue(obj)
+		{	
+			if(obj.style.backgroundColor == "lightblue" )
+			{
+				d3.select(obj).style("background-color","orange")
+				obj.innerHTML = "&nbsp;";
+			} else {
+				d3.select(obj).style("background-color","lightblue");
+				obj.innerHTML = "&nbsp;";	
+			}
+		}
+
+
+	</script>
 
 	</head>	
 	<body>
@@ -169,8 +247,11 @@
 		<div class="">
 			<div id="movement"></div>
 		</div>
-		
-
+		<button type="submit" class="btn btn-default" onclick="history.back()">Back</button>
+		<button type="submit" class="btn btn-success" onclick="initialize()">initialize</button>
+		<button type="submit" class="btn btn-danger" onclick="stopAdvertising()">Stop</button>
+		<div id="found-beacons" style="color:white"></div>
+		<button onclick="window.location.reload(true)">Reload</button>
 	</div>
 	</body>
 </html>
