@@ -31,11 +31,7 @@
 			AnyBoard.Logger.threshold = 0;
 			$("#weHaveConnectedToPawn").hide();
 			$("#functions").hide();
-			nfc.enabled(
- 				 function() {alert('yes!')},
-  				// msg is one of NO_NFC (no hardware support) or NFC_DISABLED (supported but disabled)
- 				 function(msg) {alert(msg)}
-			);
+			
 		});			
 	</script>
 
@@ -141,6 +137,7 @@
 				id: 0
 			}
 
+			
 			appendAccordion(emulator);
 			appendButtons(emulator,"emulateVibrateCmd","Vibrate");
 			appendButtons(emulator,"emulateCountCmd","Count")
@@ -151,7 +148,8 @@
 			appendButtons(emulator,"emulateDisplayDown","Display an arrow down")
 			appendDisconnect(emulator,"emulateDisconnect","Disconnect token")
 			app.count++;
-			//id++;
+			
+			bindFunc(emulator);
 		}
 		function emulateVibrateCmd(emulator) {
 
@@ -175,7 +173,7 @@
 
 		} 
 		function emulateDisconnect(emulator) {
-
+			
 		}
 
 		/*Will connect to a device and run an emulator*/
@@ -198,7 +196,15 @@
 		}
 
 		function con(device) {
-	
+			evothings.ble.connect(
+				device,
+					function(connectInfo) {
+						alert(connectInfo.device.name + " State:" + connectInfo.state );	
+					},
+					function(error) {
+						alert("Error: "+error)
+					}
+				);
 
 		}
 

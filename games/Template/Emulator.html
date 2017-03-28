@@ -8,7 +8,8 @@
 		<title>Emulator</title>	
 
 	    <!-- cordova.js based -->
-	<script src="cordova.js"></script>	
+	<script src="cordova.js"></script>
+	<script src="dist/anyboard.js"></script> 	
     <script src="libs/jquery-1.11.3.min.js"></script>
    		<!--Bootstrap library-->
 	<script src="bootstrap/js/bootstrap.min.js"></script>
@@ -17,7 +18,7 @@
     <script src="libs/evothings/evothings.js"></script>
     <script src="libs/evothings/easyble/easyble.js"></script>
     <script src="D3/d3.js"></script>
-  
+  	<script src="dist/emulatorGATT.js"></script>
   
 	<style type="text/css">
 
@@ -48,6 +49,7 @@
 	</style>
 	<script type="text/javascript">
 		$(document).ready(function(){
+
 					d3.select("body").style("background-color","black");
 					createLayout();
 					createMovementLayout();
@@ -223,6 +225,10 @@
 				d3.select(obj).style("background-color","lightblue");
 				obj.innerHTML = "&nbsp;";	
 			}
+		}
+
+		function initialize() {
+			startServer(startAdvert());
 		}
 
 
