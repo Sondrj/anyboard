@@ -47,11 +47,22 @@ function startServer(win) {
 						permissions: 1 | 16, //PERMISSION_READ | PERMISSION_WRITE
 						properties: 2 | 8 | 16, // PROPERTY_READ | PROPERTY_WRITE | PROPERTY_NOTIFY
 						writeType: 2, // WRITE_TYPE_DEFAULT
-						onReadRequest: function() {
-
+						onReadRequest: function(deviceHandle, requestId) {
+							var data = new Uint8Array([6,7,8,9,0]);
+							hyper.log("console read 1 " + requestId + ": " + evothings.util.typedArrayToHexString(data));
+							evothings.ble.sendResponse(deviceHandle,requestId, data, function() {
+								hyper.log("cr1 success");
+							}, function(error) {
+								hyper.log("cr1 fail: " + error);
+							});
 						},
-						onWriteRequest: function() {
-
+						onWriteRequest: function(deviceHandle, requestId, data) {
+							hyper.log("console write 1 " + requestId + evothings.util.typedArrayToHexString(data));
+							evothings.ble.sendResponse(deviceHandle,requestId,null, function() {
+								hyper.log("cw1 success");
+							}, function(error) {
+								hyper.log("cw1 fail: " + error);
+							});
 						},
 						descriptors: [
 							//notification control
