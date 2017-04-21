@@ -17,7 +17,7 @@
     <script src="drivers/discovery.evothings.bluetooth.js"></script>
 	<script src="drivers/bean.evothings.bluetooth.js"></script>
     <script src="drivers/rfduino.evothings.bluetooth.js"></script>
-    <script src="drivers/emulator.evothings.bluetooth.js"></script>
+    
     
 	<!-- We've used jquery for qRuick development -->
     <script src="libs/jquery-1.11.3.min.js"></script>
@@ -184,7 +184,10 @@
 
 				function onDeviceFound(device){
 					
-					$("#availableTokens").append("<br> Device Name: " +JSON.stringify(device.name) + ", Device UUID: " + JSON.stringify(device.advertisementData));
+					if(device.advertisementData === '') {
+						
+						$("#availableTokens").append("<br> Device Name: " +JSON.stringify(device.name) + ", Device UUID: " + JSON.stringify(device.advertisementData));
+					}
 					//AnyBoard.Logger('Found device:' + JSON.stringify(device.advertisementData));
 					//"<button onclick='con("+device+")'>Device</button>"
 				}

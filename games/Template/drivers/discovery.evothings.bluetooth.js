@@ -20,7 +20,7 @@
             'Discovers, connects to and reads characteristics of bluetooth devices',
         dependencies: 'evothings.easyble',
         version: '0.1',
-        date: '2015-09-08',
+        date: '2017-05-20',
         type: ['bluetooth-discovery'],
         compatibility: []
     });
@@ -41,7 +41,9 @@
      */
     discoveryBluetooth.connect = function (token, win, fail) {
         var self = this;
+        AnyBoard.Logger.debug('discToken: ' + JSON.stringify(token.device));
 
+        
         token.device.connect(function() {
             self.getServices(token, win, fail);
         }, function(errorCode) {
@@ -202,7 +204,7 @@
                         }
                     }
                 }
-
+                
                 if (device.serialChar)
                 {
                     device.haveServices = true;
