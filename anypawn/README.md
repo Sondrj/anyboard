@@ -24,11 +24,12 @@ Interaction events and digital feedbacks commands are exchanged between anyPawns
 ### Interaction events (Events sent from the anyPawn)
 
 | Type | Interaction Event | HEX Code (B1,B2,B3) | Description | Sample mapping with game mechanics | Comments |
-|------|----|----|-----|----|------------------------------------|--------|
+|------|----|----|-----|----|------------------------------------|
 | TE | SHAKE | CB | anyPawn is shaken | Throw a random number |
 | | TILT | CC |anyPawn is tilted upside down | Undo a previous action |
 | | TAP | C9 | anyPawn is tapped on the top side | Increase a resource by one unit |
 |	| DOUBLE-TAP | CA | anyPawn is double-tapped on the top side | Decrease a resource by one unit |
+| | ROTATE | TBD, PAR | one parameter to define clockwise or counterclockwise rotation, TBD |  
 | TCE | ENTERS\_[cID] | TBD, cID | anyPawn is moved inside a cID sector of the board | Signal player's placement and movements among different board sectors |
 | | LEAVES\_[cID] | TBD, cID | anyPawn is moved away from cID sector | Signal player's placement and movements among different board sectors  |
 |	TTE | APCHES\_[aID2, side] | TBD,aID,side | anyPawn is moved close to another one | Trade a resource between two players | Not implemented|
@@ -40,7 +41,7 @@ TTEs are recognized by computing the distance between two pawns using RSSI (Rece
 ### Digital feedbacks (Commands sent to the anyPawn)
 
 | Type | Feedback | HEX Code (B1,B2,..B20) | Description | Sample mapping with game mechanics | Comments |
-|------|----------|-------------|----|----|----------------------------|------|
+|------|----------|-------------|----|----|----------------------------|
 | Visual | LED\_[color] | TBD,C1,C2,C3 | anyPawn lights up in the color defined by [color] | Show the status of a resource | C1,C2,C3 are RGB value in HEX |
 | | MATRIX\_[text] | TBD,Ch1,Ch2,... | anyPawn top side display shows the string [text] | Shows player's action point allowance | Ch1,Ch2,Ch3 are char in ASCII code, up to 19 characters |
 | | MATRIX\_[icon] | TBD,Ic | anyPawn top side display shows the icon [icon]  | Show the result of a dice roll | Ic is the ide of the Icon: XX for arrow, XX for ... |
